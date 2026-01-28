@@ -15,6 +15,9 @@ const { sneakers, isLoading, filters } = storeToRefs(store);
 
 onMounted(async () => {
     scrollToTop()
+    if(sneakers.value.length === 0) {
+        isLoading.value = true
+    }
     await store.fetchSneakersData()
 })
 

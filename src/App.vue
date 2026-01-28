@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import Header from './components/Header/Header.vue';
 import DrawerWrapper from './components/DrawerWrapper.vue';
+import { onMounted } from 'vue';
+import { useState } from './store/useState';
 
+onMounted(() => {
+  useState().initialization()
+})
 
 </script>
 

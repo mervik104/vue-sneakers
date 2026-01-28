@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { reactive, ref, watch } from 'vue'
-import type { CreateOrderResponseData, FavoritesSneakers, FiltersType, isCreatingOrderType, NavElementType, Sneakers, SneakersResponse } from '../types'
+import type { CreateOrderResponseData, FiltersType, isCreatingOrderType, NavElementType, Sneakers } from '../types'
 import axios, { AxiosError } from 'axios'
 import { formatNumber } from '../utils/formatNumber';
 import Favorites from '../components/Favorites.vue'
@@ -12,14 +12,14 @@ import { useWindowSize } from '@vueuse/core';
 import { MOBILE_WIDTH, URL } from '../constants';
 export const useState = defineStore('sneakers', () => {
     const sneakers = ref<Sneakers[]>([])
+    const likedSneakers = ref<Sneakers[]>([])
     const cart = ref<Sneakers[]>([])
     const cartPrice = ref<number>(0)
     const error = ref<AxiosError | null>(null)
-    const isLoading = ref<boolean>(true)
-    const likesIsLoading = ref<boolean>(true)
+    const isLoading = ref<boolean>(false)
     const isDrawer = ref<boolean>(false)
     const drawerPath = ref('')
-    const {width: displayWidth, height: displayHeight} = useWindowSize()
+    const { width: displayWidth, height: displayHeight } = useWindowSize()
     const isCreatingOrder = reactive<isCreatingOrderType>({
         isLoading: false,
         isSucces: false,
@@ -31,42 +31,9 @@ export const useState = defineStore('sneakers', () => {
     }
     const filters = reactive<FiltersType>(filtersDefaultValue)
 
-    const fetchLikesData = async () => {
-        likesIsLoading.value = true
-        if (!sneakers.value) {
-            isLoading.value = true
-        }
-        try {
-            const { data: likes } = await axios.get<FavoritesSneakers[]>(URL + `/favorites`)
-            if (likes) {
-                if (sneakers.value) {
-                    sneakers.value = sneakers.value.map((sn) => {
-                        const like = likes.find((like) => sn.id === like.itemId)
-                        if (like) {
-                            const favoriteSneaker = {
-                                ...sn,
-                                likedId: like.id,
-                                isLiked: true,
-                            }
-                            return favoriteSneaker
-                        }
-                        else {
-                            return {
-                                ...sn,
-                                isLiked: false,
-                                likedId: null,
-                            }
-                        }
-                    })
-                }
-            }
-        } catch (er) {
-            const e = er as AxiosError
-            error.value = e
-        } finally {
-            isLoading.value = false
-            likesIsLoading.value = false
-        }
+    const initialization = () => {
+        const cartInLocalStorage: Sneakers[] = JSON.parse(localStorage.getItem('cart') || '[]')
+        cart.value = cartInLocalStorage
     }
 
     const resetFilters = () => {
@@ -76,26 +43,29 @@ export const useState = defineStore('sneakers', () => {
     }
 
     const fetchSneakersData = async () => {
-        if (!sneakers.value) {
-            isLoading.value = true
-        }
         try {
             const params = {
                 sortBy: filters.sortBy,
                 title: `*${filters.searchQuery}*`,
             }
-            const { data } = await axios.get<SneakersResponse[]>(URL + `/items`, { params })
-            sneakers.value = data.map((sneaker: SneakersResponse) => {
-                return {
-                    ...sneaker,
-                    likedId: null,
-                    isLiked: false,
-                    isAddedToCart: false,
-                }
-            })
-            const cartInLocalStorage: Sneakers[] = JSON.parse(localStorage.getItem('cart') || '[]')
-            cart.value = cartInLocalStorage
-            await fetchLikesData()
+            const { data } = await axios.get<Sneakers[]>(URL + `/sneakers`, { params })
+            sneakers.value = data
+        } catch (er) {
+            const e = er as AxiosError
+            error.value = e
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    const fetchFavorites = async () => {
+        try {
+            const params = {
+                sortBy: filters.sortBy,
+                title: `*${filters.searchQuery}*`,
+            }
+            const { data } = await axios.get<Sneakers[]>(URL + `/favorites`, { params })
+            likedSneakers.value = data
         } catch (er) {
             const e = er as AxiosError
             error.value = e
@@ -108,18 +78,18 @@ export const useState = defineStore('sneakers', () => {
         try {
             if (!sneaker.isLiked) {
                 sneaker.isLiked = true
-                const { data } = await axios.post(URL + `/favorites`, { itemId: sneaker.id })
-                sneaker.likedId = data.id
+                await axios.post(URL + `/favorites/${sneaker.id}`,)
             }
             else if (sneaker.isLiked) {
                 sneaker.isLiked = false
-                await axios.delete(URL + `/favorites/${sneaker.likedId}`)
-                sneaker.likedId = null
+                await axios.delete(URL + `/favorites/${sneaker.id}`)
             }
         } catch (er) {
-            sneaker.isLiked = false
+            sneaker.isLiked = !sneaker.isLiked
             const e = er as AxiosError
             error.value = e
+        } finally {
+            await fetchFavorites()
         }
     }
 
@@ -160,6 +130,7 @@ export const useState = defineStore('sneakers', () => {
             addCart(sneaker)
         }
     }
+
     const delCart = (sneaker: Sneakers) => {
         sneaker.isAddedToCart = false
         cart.value = cart.value.filter((sn) => sn.id !== sneaker.id)
@@ -175,6 +146,7 @@ export const useState = defineStore('sneakers', () => {
             }
         })
     }
+
     const navElements = ref<NavElementType[]>([
         {
             path: Paths.home,
@@ -212,7 +184,7 @@ export const useState = defineStore('sneakers', () => {
     })
     watch(error, () => {
         toast.error(error.value)
-    }, {deep: true})
+    }, { deep: true })
     watch(filters, fetchSneakersData)
     watch(cart, () => {
         localStorage.setItem('cart', JSON.stringify(cart.value))
@@ -221,24 +193,24 @@ export const useState = defineStore('sneakers', () => {
         }, 0)
         cartPrice.value = price
         navElements.value.map((el) => {
-            if(el.styles.includes('nav-cart')) {
+            if (el.styles.includes('nav-cart')) {
                 el.name = `${formatNumber(price)} руб`
             }
         })
     }, { deep: true })
 
     watch(displayWidth, () => {
-            navElements.value.map((el) => {
-                if (el.styles.includes('nav-cart')) {
-                    if (displayWidth.value < MOBILE_WIDTH) {
-                        el.path = Paths.drawer
-                    }
-                    else {
-                        el.path = ''
-                    }
+        navElements.value.map((el) => {
+            if (el.styles.includes('nav-cart')) {
+                if (displayWidth.value < MOBILE_WIDTH) {
+                    el.path = Paths.drawer
                 }
-            })
-    }, {immediate: true})
+                else {
+                    el.path = ''
+                }
+            }
+        })
+    }, { immediate: true })
 
     return {
         fetchSneakersData,
@@ -256,8 +228,10 @@ export const useState = defineStore('sneakers', () => {
         delCart,
         navElements,
         resetFilters,
-        likesIsLoading,
         displayWidth,
         displayHeight,
+        fetchFavorites,
+        likedSneakers,
+        initialization
     }
 })

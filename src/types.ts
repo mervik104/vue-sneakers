@@ -1,32 +1,18 @@
 import type { Component } from "vue"
 
-export type SneakersResponse = {
-    id: number,
-    title: string,
-    price: number,
-    imageUrl: string,
-}
-
 export type Sneakers = {
     id: number,
     title: string,
     price: number,
     imageUrl: string,
-    likedId: number | null,
     isLiked: boolean,
     isAddedToCart: boolean,
 }
 
-export type FavoritesSneakers = {
-    id: number,
-    itemId: number,
-}
-
 export type CreateOrderResponseData = {
-    items: Sneakers,
+    items: Sneakers[],
     totalPrice: number,
 }
-
 
 export type isCreatingOrderType = {
     isLoading: boolean,

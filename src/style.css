@@ -1,9 +1,9 @@
 @import "tailwindcss";
 @import 'vue3-toastify/dist/index.css';
+
 html {
   scroll-behavior: smooth;
 }
-
 body {
   background-color: rgb(247 254 231);
 }
