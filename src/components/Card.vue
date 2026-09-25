@@ -3,8 +3,6 @@ import { ref } from 'vue';
 import type { Sneakers } from '../types';
 import { flyToCart } from '../utils/flyto';
 import { formatNumber } from '../utils/formatNumber';
-import { storeToRefs } from 'pinia';
-import { useState } from '../store/useState';
 
 
 defineProps<Sneakers>()
@@ -14,7 +12,6 @@ const productRef = ref<any>(null)
 const buttonRef = ref<any>(null) 
 const imgIsLoad = ref<boolean>(false)
 const imgLikeIsLoad = ref<boolean>(false)
-const {likesIsLoading} = storeToRefs(useState())
 </script>
 
 <template>
@@ -24,7 +21,7 @@ const {likesIsLoading} = storeToRefs(useState())
             <button 
             @click="emit('handleSetLike')" 
             class="absolute active:brightness-90 hover:brightness-95 top-8 left-1 cursor-pointer">
-                <div v-if="likesIsLoading && !imgLikeIsLoad" class="w-8 h-8 overflow-hidden">
+                <div v-if="!imgLikeIsLoad" class="w-8 h-8 overflow-hidden">
                     <v-skeleton-loader class="rounded-2xl" width="32" height="32" type="image" />
                 </div>
                 <img v-else

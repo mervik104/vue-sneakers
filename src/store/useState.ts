@@ -39,7 +39,6 @@ export const useState = defineStore('sneakers', () => {
     const resetFilters = () => {
         filters.searchQuery = filtersDefaultValue.searchQuery
         filters.sortBy = filtersDefaultValue.sortBy
-        console.log(filters)
     }
 
     const fetchSneakersData = async () => {
@@ -48,7 +47,7 @@ export const useState = defineStore('sneakers', () => {
                 sortBy: filters.sortBy,
                 title: `*${filters.searchQuery}*`,
             }
-            const { data } = await axios.get<Sneakers[]>(URL + `/sneakers`, { params })
+            const { data } = await axios.get<Sneakers[]>(URL + `/items`, { params })
             sneakers.value = data
         } catch (er) {
             const e = er as AxiosError
@@ -107,8 +106,6 @@ export const useState = defineStore('sneakers', () => {
         } catch (er) {
             isCreatingOrder.isLoading = false
             isCreatingOrder.isError = true
-            debugger
-            console.error(er);
             const e = er as AxiosError;
             error.value = e;
             throw e;

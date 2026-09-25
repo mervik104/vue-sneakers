@@ -1,5 +1,69 @@
-# Vue 3 + TypeScript + Vite
+# Vue Sneakers
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Учебный проект интернет-магазина кроссовок на Vue 3, TypeScript и Vite.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+> Этот проект был написан примерно полгода назад в начале изучения Vue. Он демонстрирует учебный прогресс, но не отражает мой текущий уровень профессиональных навыков.
+
+## Возможности
+
+- каталог кроссовок с поиском и сортировкой;
+- добавление товаров в корзину и удаление из неё;
+- избранное с сохранением состояния на сервере mock API;
+- оформление демонстрационного заказа;
+- адаптивная верстка для мобильных устройств;
+- skeleton loaders, toast-уведомления и анимация добавления в корзину;
+- маршрутизация страниц каталога, избранного, профиля и корзины.
+
+Проект учебный: авторизация, платежи, серверная валидация и полноценный backend не реализованы.
+
+## Стек
+
+- Vue 3;
+- TypeScript;
+- Vite;
+- Pinia;
+- Vue Router;
+- Tailwind CSS;
+- Vuetify;
+- Axios.
+
+## Запуск
+
+Требуется Node.js 20.19+ или 22.12+ (требования Vite 7).
+
+```bash
+npm install
+npm run dev
+```
+
+После запуска приложение будет доступно по адресу, который Vite выведет в консоли.
+
+### API
+
+Адрес API задаётся через `VITE_API_URL`. Приложение использует ресурсы Mokky `/items`, `/favorites` и `/orders`. В `.env.example` указан учебный mock API; если его ресурсы станут недоступны, укажите рабочий адрес своего mock/backend API в локальном `.env`:
+
+```bash
+VITE_API_URL=https://afb4f238be60fc9e.mokky.dev
+```
+
+Файл `.env` не должен попадать в Git. В репозитории есть шаблон `.env.example`.
+
+## Команды
+
+```bash
+npm run dev       # запуск dev-сервера
+npm run build     # проверка типов и production-сборка
+npm run preview   # просмотр production-сборки
+```
+
+## Структура
+
+- `src/components` — компоненты интерфейса;
+- `src/store` — состояние приложения и работа с API;
+- `src/utils` — вспомогательные функции;
+- `public` — статические изображения и иконки;
+- `src/router.ts` — маршруты страниц.
+
+## Лицензия
+
+Проект распространяется по лицензии MIT. Подробности — в файле [LICENSE](LICENSE).

@@ -25,13 +25,13 @@ const delCart = useState().delCart
         <InfoBlock v-else-if="isCreatingOrder.isError"
             @callback="() => { emit('closeDrawer'); isCreatingOrder.isSucces = false }"
             @close-drawer="emit('closeDrawer')"
-            desc="К сожалению что-то пошло не так. Попробуйте позже! :(" src="/public/emoji-2.png">
+            desc="К сожалению что-то пошло не так. Попробуйте позже! :(" src="/emoji-2.png">
             <p class="text-red-500">Ошибка!</p>
         </InfoBlock>
 
         <InfoBlock v-else-if="isCreatingOrder.isSucces"
             @callback="() => { emit('closeDrawer'); isCreatingOrder.isSucces = false }"
-            desc="Ваш заказ скоро будет передан курьерской доставке" src="/public/order-success-icon.png"
+            desc="Ваш заказ скоро будет передан курьерской доставке" src="/order-success-icon.png"
             @close-drawer="emit('closeDrawer')">
             <p class="text-lime-500">Заказ оформлен!</p>
         </InfoBlock>
@@ -43,7 +43,7 @@ const delCart = useState().delCart
         </div>
 
         <InfoBlock v-else @callback="() => emit('closeDrawer')"
-            desc="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ" src="/public/package-icon.png"
+            desc="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ" src="/package-icon.png"
             @close-drawer="emit('closeDrawer')">
             Корзина пустая
         </InfoBlock>

@@ -2,7 +2,7 @@
 import type { NavElementType } from '../../types';
 import NavItem from './NavItem.vue';
 const isDrawer = defineModel<boolean>('isDrawer', {required: true})
-const props = defineProps<{navElements: NavElementType[], isMobile?: boolean}>()
+defineProps<{navElements: NavElementType[], isMobile?: boolean}>()
 </script>
 
 <template>
